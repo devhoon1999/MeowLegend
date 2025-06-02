@@ -47,18 +47,15 @@ public class AudioManager : MonoBehaviour
             Instance = this;
             DontDestroyOnLoad(gameObject);
 
-            // BGM Source 세팅
             bgmSource = gameObject.AddComponent<AudioSource>();
             bgmSource.outputAudioMixerGroup = bgmMixerGroup;
             bgmSource.loop = true;
             bgmSource.volume = 0f;
 
-            // SFX Source 세팅
             sfxSource = gameObject.AddComponent<AudioSource>();
             sfxSource.outputAudioMixerGroup = sfxMixerGroup;
             sfxSource.loop = false;
 
-            // 게임 시작 시 첫 BGM 페이드인 재생
             PlayBGM(AudioClipName.BGM1, 1f);
         }
         else
@@ -67,7 +64,6 @@ public class AudioManager : MonoBehaviour
         }
     }
 
-    // BGM 재생: 기존 BGM 페이드아웃 후 새 BGM 페이드인
     public void PlayBGM(AudioClipName clipName, float fadeDuration = 1f)
     {
         if (bgmFadeCoroutine != null)
@@ -84,10 +80,8 @@ public class AudioManager : MonoBehaviour
 
     private IEnumerator SwapBGMCoroutine(string newBGMKey, float fadeDuration)
     {
-        // 기존 BGM 페이드아웃
         yield return StartCoroutine(FadeOutCoroutine(fadeDuration));
 
-        // 새 BGM 로드
         var handle = Addressables.LoadAssetAsync<AudioClip>(newBGMKey);
         yield return handle;
 
@@ -96,7 +90,6 @@ public class AudioManager : MonoBehaviour
             bgmSource.clip = handle.Result;
             bgmSource.Play();
 
-            // 새 BGM 페이드인
             yield return StartCoroutine(FadeInCoroutine(fadeDuration));
         }
         else
@@ -131,7 +124,6 @@ public class AudioManager : MonoBehaviour
         bgmSource.Stop();
     }
 
-    // 효과음 재생 - 짧은 효과음은 OneShot으로 재생
     public void PlaySFX(AudioClipName clipName)
     {
         if (isSfxMuted) return;
@@ -160,30 +152,34 @@ public class AudioManager : MonoBehaviour
         }
     }
 
-    // 전체 음소거 토글
+    // 전체 음소거 토글 (BGM, SFX 둘 다)
     public void SetMuteAll(bool mute)
     {
-        isBgmMuted = mute;
-        isSfxMuted = mute;
-        bgmSource.mute = mute;
-        sfxSource.mute = mute;
+        SetMuteBGM(mute);
+        SetMuteSFX(mute);
     }
 
-    // BGM 음소거 토글
     public void SetMuteBGM(bool mute)
     {
         isBgmMuted = mute;
-        bgmSource.mute = mute;
+
+        if (mute)
+        {
+            bgmSource.volume = 0f;
+        }
+        else
+        {
+            bgmSource.volume = bgmVolume;
+        }
+        bgmSource.mute = false; // mute 대신 볼륨 제어로 음소거 처리
     }
 
-    // SFX 음소거 토글
     public void SetMuteSFX(bool mute)
     {
         isSfxMuted = mute;
-        sfxSource.mute = mute;
+        // SFX 음소거는 isSfxMuted 플래그로 재생 시 판단
     }
 
-    // BGM 볼륨 조절 (0~1)
     public void SetBGMVolume(float volume)
     {
         bgmVolume = Mathf.Clamp01(volume);
@@ -191,7 +187,6 @@ public class AudioManager : MonoBehaviour
             bgmSource.volume = bgmVolume;
     }
 
-    // SFX 볼륨 조절 (0~1)
     public void SetSFXVolume(float volume)
     {
         sfxVolume = Mathf.Clamp01(volume);

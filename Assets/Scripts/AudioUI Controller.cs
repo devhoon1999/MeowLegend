@@ -7,15 +7,15 @@ public class AudioVolumeUI : MonoBehaviour
     [SerializeField] private Slider bgmSlider;
     [SerializeField] private Button bgmMuteButton;
     [SerializeField] private Image bgmMuteIcon;
-    [SerializeField] private Sprite bgmMuteOnSprite;     // BGM 음소거 해제 아이콘
-    [SerializeField] private Sprite bgmMuteOffSprite;    // BGM 음소거 아이콘
+    [SerializeField] private Sprite bgmMuteOnSprite;
+    [SerializeField] private Sprite bgmMuteOffSprite;
 
     [Header("SFX")]
     [SerializeField] private Slider sfxSlider;
     [SerializeField] private Button sfxMuteButton;
     [SerializeField] private Image sfxMuteIcon;
-    [SerializeField] private Sprite sfxMuteOnSprite;     // SFX 음소거 해제 아이콘
-    [SerializeField] private Sprite sfxMuteOffSprite;    // SFX 음소거 아이콘
+    [SerializeField] private Sprite sfxMuteOnSprite;
+    [SerializeField] private Sprite sfxMuteOffSprite;
 
     private bool isBgmMuted = false;
     private bool isSfxMuted = false;
@@ -46,64 +46,82 @@ public class AudioVolumeUI : MonoBehaviour
 
     private void OnBgmSliderChanged(float value)
     {
-        if (isBgmMuted && value > 0f)
+        if (value <= 0f)
         {
-            isBgmMuted = false;
-            UpdateBGMMuteIcon();
-            AudioManager.Instance.SetMuteBGM(false);
+            if (!isBgmMuted)
+            {
+                isBgmMuted = true;
+                UpdateBGMMuteIcon();
+            }
         }
-        lastBgmVolume = value;
+        else
+        {
+            if (isBgmMuted)
+            {
+                isBgmMuted = false;
+                UpdateBGMMuteIcon();
+            }
+        }
+        AudioManager.Instance.SetMuteBGM(isBgmMuted);
         AudioManager.Instance.SetBGMVolume(value);
+
+        if (!isBgmMuted)
+            lastBgmVolume = value;
     }
 
     private void OnSfxSliderChanged(float value)
     {
-        if (isSfxMuted && value > 0f)
+        if (value <= 0f)
         {
-            isSfxMuted = false;
-            UpdateSFXMuteIcon();
-            AudioManager.Instance.SetMuteSFX(false);
+            if (!isSfxMuted)
+            {
+                isSfxMuted = true;
+                UpdateSFXMuteIcon();
+            }
         }
-        lastSfxVolume = value;
+        else
+        {
+            if (isSfxMuted)
+            {
+                isSfxMuted = false;
+                UpdateSFXMuteIcon();
+            }
+        }
+        AudioManager.Instance.SetMuteSFX(isSfxMuted);
         AudioManager.Instance.SetSFXVolume(value);
+
+        if (!isSfxMuted)
+            lastSfxVolume = value;
     }
 
     private void ToggleBGMMute()
     {
+        isBgmMuted = !isBgmMuted;
+        AudioManager.Instance.SetMuteBGM(isBgmMuted);
+
         if (isBgmMuted)
         {
-            isBgmMuted = false;
-            AudioManager.Instance.SetMuteBGM(false);
-            AudioManager.Instance.SetBGMVolume(lastBgmVolume);
-            bgmSlider.value = lastBgmVolume;
+            bgmSlider.value = 0f;
         }
         else
         {
-            isBgmMuted = true;
-            lastBgmVolume = bgmSlider.value;
-            AudioManager.Instance.SetMuteBGM(true);
-            AudioManager.Instance.SetBGMVolume(0f);
-            bgmSlider.value = 0f;
+            bgmSlider.value = lastBgmVolume > 0f ? lastBgmVolume : 1f;
         }
         UpdateBGMMuteIcon();
     }
 
     private void ToggleSFXMute()
     {
+        isSfxMuted = !isSfxMuted;
+        AudioManager.Instance.SetMuteSFX(isSfxMuted);
+
         if (isSfxMuted)
         {
-            isSfxMuted = false;
-            AudioManager.Instance.SetMuteSFX(false);
-            AudioManager.Instance.SetSFXVolume(lastSfxVolume);
-            sfxSlider.value = lastSfxVolume;
+            sfxSlider.value = 0f;
         }
         else
         {
-            isSfxMuted = true;
-            lastSfxVolume = sfxSlider.value;
-            AudioManager.Instance.SetMuteSFX(true);
-            AudioManager.Instance.SetSFXVolume(0f);
-            sfxSlider.value = 0f;
+            sfxSlider.value = lastSfxVolume > 0f ? lastSfxVolume : 1f;
         }
         UpdateSFXMuteIcon();
     }
