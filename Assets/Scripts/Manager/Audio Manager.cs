@@ -1,41 +1,50 @@
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
-using UnityEngine.ResourceManagement.AsyncOperations;
-using System.Collections.Generic;
+using UnityEngine.Audio;
 
-public enum BGMType
+public enum AudioClipName
 {
-    MainTheme,
-    Battle,
-    Boss
+    MainBGM,
+    BattleBGM,
+    ClickSFX,
+    ExplosionSFX,
+    // 필요한 오디오 이름들을 여기에 추가
 }
 
-public enum SFXType
+public enum AudioType
 {
-    Click,
-    Explosion,
-    Jump,
-    Hit
+    BGM,
+    SFX
 }
 
 public class AudioManager : MonoBehaviour
 {
     public static AudioManager Instance { get; private set; }
 
-    [Header("Audio Sources")]
-    [SerializeField] private AudioSource bgmSource;
-    [SerializeField] private AudioSource sfxSource;
+    [Header("Audio Mixer Groups")]
+    [SerializeField] private AudioMixerGroup bgmMixerGroup;
+    [SerializeField] private AudioMixerGroup sfxMixerGroup;
 
-    [Header("Initial Volumes")]
-    [Range(0f, 1f)] public float bgmVolume = 1f;
-    [Range(0f, 1f)] public float sfxVolume = 1f;
+    private AudioSource bgmSource;
+    private AudioSource sfxSource;
 
-    private bool isMutedAll = false;
-    private bool isMutedBGM = false;
-    private bool isMutedSFX = false;
+    private Coroutine bgmFadeCoroutine;
 
-    private Dictionary<BGMType, AudioClip> bgmClips = new();
-    private Dictionary<SFXType, AudioClip> sfxClips = new();
+    private Dictionary<AudioClipName, string> addressableKeys = new Dictionary<AudioClipName, string>()
+    {
+        { AudioClipName.MainBGM, "MainBGM" },
+        { AudioClipName.BattleBGM, "BattleBGM" },
+        { AudioClipName.ClickSFX, "ClickSFX" },
+        { AudioClipName.ExplosionSFX, "ExplosionSFX" },
+        // 실제 Addressable key와 enum 매칭
+    };
+
+    private bool isBgmMuted = false;
+    private bool isSfxMuted = false;
+    private float bgmVolume = 1f;
+    private float sfxVolume = 1f;
 
     private void Awake()
     {
@@ -43,7 +52,20 @@ public class AudioManager : MonoBehaviour
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);
-            LoadAllAudio();
+
+            // BGM Source 세팅
+            bgmSource = gameObject.AddComponent<AudioSource>();
+            bgmSource.outputAudioMixerGroup = bgmMixerGroup;
+            bgmSource.loop = true;
+            bgmSource.volume = 0f;
+
+            // SFX Source 세팅
+            sfxSource = gameObject.AddComponent<AudioSource>();
+            sfxSource.outputAudioMixerGroup = sfxMixerGroup;
+            sfxSource.loop = false;
+
+            // 게임 시작 시 첫 BGM 페이드인 재생
+            PlayBGM(AudioClipName.MainBGM, 2f);
         }
         else
         {
@@ -51,82 +73,133 @@ public class AudioManager : MonoBehaviour
         }
     }
 
-    private void LoadAllAudio()
+    // BGM 재생: 기존 BGM 페이드아웃 후 새 BGM 페이드인
+    public void PlayBGM(AudioClipName clipName, float fadeDuration = 1f)
     {
-        foreach (BGMType type in System.Enum.GetValues(typeof(BGMType)))
+        if (bgmFadeCoroutine != null)
+            StopCoroutine(bgmFadeCoroutine);
+
+        if (!addressableKeys.TryGetValue(clipName, out string key))
         {
-            Addressables.LoadAssetAsync<AudioClip>($"Audio/BGM/{type}").Completed += handle =>
-            {
-                if (handle.Status == AsyncOperationStatus.Succeeded)
-                    bgmClips[type] = handle.Result;
-            };
+            Debug.LogWarning($"BGM key not found for {clipName}");
+            return;
         }
 
-        foreach (SFXType type in System.Enum.GetValues(typeof(SFXType)))
-        {
-            Addressables.LoadAssetAsync<AudioClip>($"Audio/SFX/{type}").Completed += handle =>
-            {
-                if (handle.Status == AsyncOperationStatus.Succeeded)
-                    sfxClips[type] = handle.Result;
-            };
-        }
+        bgmFadeCoroutine = StartCoroutine(SwapBGMCoroutine(key, fadeDuration));
     }
 
-    public void PlayBGM(BGMType type, bool loop = true)
+    private IEnumerator SwapBGMCoroutine(string newBGMKey, float fadeDuration)
     {
-        if (bgmClips.TryGetValue(type, out var clip))
+        // 기존 BGM 페이드아웃
+        yield return StartCoroutine(FadeOutCoroutine(fadeDuration));
+
+        // 새 BGM 로드
+        var handle = Addressables.LoadAssetAsync<AudioClip>(newBGMKey);
+        yield return handle;
+
+        if (handle.Status == UnityEngine.ResourceManagement.AsyncOperations.AsyncOperationStatus.Succeeded)
         {
-            bgmSource.clip = clip;
-            bgmSource.loop = loop;
-            bgmSource.volume = isMutedAll || isMutedBGM ? 0f : bgmVolume;
+            bgmSource.clip = handle.Result;
             bgmSource.Play();
+
+            // 새 BGM 페이드인
+            yield return StartCoroutine(FadeInCoroutine(fadeDuration));
+        }
+        else
+        {
+            Debug.LogWarning($"Failed to load BGM: {newBGMKey}");
         }
     }
 
-    public void StopBGM()
+    private IEnumerator FadeInCoroutine(float duration)
     {
+        float timer = 0f;
+        while (timer < duration)
+        {
+            timer += Time.deltaTime;
+            bgmSource.volume = Mathf.Lerp(0f, bgmVolume, timer / duration);
+            yield return null;
+        }
+        bgmSource.volume = bgmVolume;
+    }
+
+    private IEnumerator FadeOutCoroutine(float duration)
+    {
+        float timer = 0f;
+        float startVolume = bgmSource.volume;
+        while (timer < duration)
+        {
+            timer += Time.deltaTime;
+            bgmSource.volume = Mathf.Lerp(startVolume, 0f, timer / duration);
+            yield return null;
+        }
+        bgmSource.volume = 0f;
         bgmSource.Stop();
     }
 
-    public void PlaySFX(SFXType type)
+    // 효과음 재생 - 짧은 효과음은 OneShot으로 재생
+    public void PlaySFX(AudioClipName clipName)
     {
-        if (sfxClips.TryGetValue(type, out var clip))
+        if (isSfxMuted) return;
+
+        if (!addressableKeys.TryGetValue(clipName, out string key))
         {
-            sfxSource.PlayOneShot(clip, isMutedAll || isMutedSFX ? 0f : sfxVolume);
+            Debug.LogWarning($"SFX key not found for {clipName}");
+            return;
+        }
+
+        StartCoroutine(PlaySFXCoroutine(key));
+    }
+
+    private IEnumerator PlaySFXCoroutine(string key)
+    {
+        var handle = Addressables.LoadAssetAsync<AudioClip>(key);
+        yield return handle;
+
+        if (handle.Status == UnityEngine.ResourceManagement.AsyncOperations.AsyncOperationStatus.Succeeded)
+        {
+            sfxSource.PlayOneShot(handle.Result, sfxVolume);
+        }
+        else
+        {
+            Debug.LogWarning($"Failed to load SFX: {key}");
         }
     }
 
-    public void SetMasterMute(bool mute)
+    // 전체 음소거 토글
+    public void SetMuteAll(bool mute)
     {
-        isMutedAll = mute;
-        ApplyVolumes();
+        isBgmMuted = mute;
+        isSfxMuted = mute;
+        bgmSource.mute = mute;
+        sfxSource.mute = mute;
     }
 
-    public void SetBGMMute(bool mute)
+    // BGM 음소거 토글
+    public void SetMuteBGM(bool mute)
     {
-        isMutedBGM = mute;
-        ApplyVolumes();
+        isBgmMuted = mute;
+        bgmSource.mute = mute;
     }
 
-    public void SetSFXMute(bool mute)
+    // SFX 음소거 토글
+    public void SetMuteSFX(bool mute)
     {
-        isMutedSFX = mute;
+        isSfxMuted = mute;
+        sfxSource.mute = mute;
     }
 
+    // BGM 볼륨 조절 (0~1)
     public void SetBGMVolume(float volume)
     {
         bgmVolume = Mathf.Clamp01(volume);
-        ApplyVolumes();
+        if (!isBgmMuted)
+            bgmSource.volume = bgmVolume;
     }
 
+    // SFX 볼륨 조절 (0~1)
     public void SetSFXVolume(float volume)
     {
         sfxVolume = Mathf.Clamp01(volume);
-    }
-
-    private void ApplyVolumes()
-    {
-        bgmSource.volume = isMutedAll || isMutedBGM ? 0f : bgmVolume;
-        // sfxSource는 PlayOneShot이라 실시간 볼륨 반영 불가
     }
 }
