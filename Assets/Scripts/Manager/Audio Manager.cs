@@ -6,10 +6,7 @@ using UnityEngine.Audio;
 
 public enum AudioClipName
 {
-    MainBGM,
-    BattleBGM,
-    ClickSFX,
-    ExplosionSFX,
+    BGM1
     // 필요한 오디오 이름들을 여기에 추가
 }
 
@@ -34,10 +31,7 @@ public class AudioManager : MonoBehaviour
 
     private Dictionary<AudioClipName, string> addressableKeys = new Dictionary<AudioClipName, string>()
     {
-        { AudioClipName.MainBGM, "MainBGM" },
-        { AudioClipName.BattleBGM, "BattleBGM" },
-        { AudioClipName.ClickSFX, "ClickSFX" },
-        { AudioClipName.ExplosionSFX, "ExplosionSFX" },
+        { AudioClipName.BGM1, "Sail_to_the_Stars" },
         // 실제 Addressable key와 enum 매칭
     };
 
@@ -65,7 +59,7 @@ public class AudioManager : MonoBehaviour
             sfxSource.loop = false;
 
             // 게임 시작 시 첫 BGM 페이드인 재생
-            PlayBGM(AudioClipName.MainBGM, 2f);
+            PlayBGM(AudioClipName.BGM1, 1f);
         }
         else
         {
@@ -201,5 +195,25 @@ public class AudioManager : MonoBehaviour
     public void SetSFXVolume(float volume)
     {
         sfxVolume = Mathf.Clamp01(volume);
+    }
+
+    public float GetBGMVolume()
+    {
+        return bgmVolume;
+    }
+
+    public float GetSFXVolume()
+    {
+        return sfxVolume;
+    }
+
+    public bool IsBgmMuted()
+    {
+        return isBgmMuted;
+    }
+
+    public bool IsSfxMuted()
+    {
+        return isSfxMuted;
     }
 }
