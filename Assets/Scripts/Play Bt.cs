@@ -6,6 +6,6 @@ public class PlayBt : MonoBehaviour
 {
     public void PlayButton()
     {
-        MySceneManager.Instance.LoadScene("Town");
+        MySceneManager.Instance.LoadScene("Home");
     }
 }
