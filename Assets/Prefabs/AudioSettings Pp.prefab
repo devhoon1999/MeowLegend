@@ -154,7 +154,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 9.9, y: 30.1}
+  m_AnchoredPosition: {x: 9.9, y: 26.3}
   m_SizeDelta: {x: 200, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &6637646761040700
@@ -187,15 +187,15 @@ MonoBehaviour:
       m_Calls: []
   m_text: "\uBC30\uACBD\uC74C\uC545"
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: de1b04ab1376dbf4f85f4cfd1ee3093b, type: 2}
-  m_sharedMaterial: {fileID: 8703039803767859916, guid: de1b04ab1376dbf4f85f4cfd1ee3093b, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: d12cd48138d1a7f4288b3d7995ae18e8, type: 2}
+  m_sharedMaterial: {fileID: 8214989092919215974, guid: d12cd48138d1a7f4288b3d7995ae18e8, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4281808770
-  m_fontColor: {r: 0.50980395, g: 0.21568628, b: 0.21568628, a: 1}
+    rgba: 4282335120
+  m_fontColor: {r: 0.5660378, g: 0.248309, b: 0.248309, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -490,7 +490,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 12.1, y: -11.3}
+  m_AnchoredPosition: {x: 12.1, y: -15.7}
   m_SizeDelta: {x: 200, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &860387757024690067
@@ -523,8 +523,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: "\uD6A8\uACFC\uC74C"
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: de1b04ab1376dbf4f85f4cfd1ee3093b, type: 2}
-  m_sharedMaterial: {fileID: 8703039803767859916, guid: de1b04ab1376dbf4f85f4cfd1ee3093b, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: d12cd48138d1a7f4288b3d7995ae18e8, type: 2}
+  m_sharedMaterial: {fileID: 8214989092919215974, guid: d12cd48138d1a7f4288b3d7995ae18e8, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
