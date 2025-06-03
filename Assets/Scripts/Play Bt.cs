@@ -6,6 +6,6 @@ public class PlayBt : MonoBehaviour
 {
     public void PlayButton()
     {
-        MySceneManager.Instance.LoadScene("Home");
+        PopupManager.Instance.ShowPopup(PopupType.IDInputfield);
     }
 }

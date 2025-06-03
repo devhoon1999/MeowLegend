@@ -1,12 +1,16 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using System.Collections.Generic;
 
 public enum PopupType
 {
-    AudioSettings
-    // ÇÊ¿äÇÑ ÆË¾÷ Å¸ÀÔ Ãß°¡
+    AudioSettings,
+    PauseMenu,
+    Giveup,
+    IDInputfield,
+    Ranking
+    // í•„ìš”í•œ íŒì—… íƒ€ì… ì¶”ê°€
 }
 
 public class PopupManager : MonoBehaviour
@@ -24,14 +28,12 @@ public class PopupManager : MonoBehaviour
     [SerializeField] private List<PopupEntry> popupPrefabs;
 
     [Header("Blocker Prefab")]
-    [SerializeField] private GameObject blockerPrefab; // Å¬¸¯ Â÷´Ü¿ë ºí·ÎÄ¿ ÇÁ¸®ÆÕ
-
-    [Header("Canvas Reference")]
-    [SerializeField] private Canvas mainCanvas;
+    [SerializeField] private GameObject blockerPrefab;
 
     private Dictionary<PopupType, GameObject> activePopups = new Dictionary<PopupType, GameObject>();
 
     private GameObject globalBlocker;
+    private Canvas currentCanvas;
 
     private void Awake()
     {
@@ -39,10 +41,6 @@ public class PopupManager : MonoBehaviour
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);
-            if (mainCanvas == null)
-            {
-                Debug.LogError("PopupManager: Main Canvas is not assigned!");
-            }
         }
         else
         {
@@ -50,20 +48,40 @@ public class PopupManager : MonoBehaviour
         }
     }
 
+    public void SetCanvas(Canvas canvas)
+    {
+        currentCanvas = canvas;
+    }
+
     public void ShowPopup(PopupType type)
     {
-        if (activePopups.ContainsKey(type))
+        if (currentCanvas == null)
         {
-            activePopups[type].SetActive(true);
-            BringToFront(activePopups[type]);
-            ActivateBlocker();
+            Debug.LogError("PopupManager: Canvas not assigned. Use SetCanvas() first.");
             return;
         }
 
+        // ğŸ” ê¸°ì¡´ íŒì—…ì´ íŒŒê´´ëëŠ”ì§€ í™•ì¸
+        if (activePopups.TryGetValue(type, out GameObject existingPopup))
+        {
+            if (existingPopup == null)
+            {
+                activePopups.Remove(type); // ì°¸ì¡° ì œê±°
+            }
+            else
+            {
+                existingPopup.SetActive(true);
+                BringToFront(existingPopup);
+                ActivateBlocker();
+                return;
+            }
+        }
+
+        // ìƒˆë¡œ ìƒì„±
         var entry = popupPrefabs.Find(p => p.type == type);
         if (entry != null && entry.prefab != null)
         {
-            GameObject popupInstance = Instantiate(entry.prefab, mainCanvas.transform, false);
+            GameObject popupInstance = Instantiate(entry.prefab, currentCanvas.transform, false);
             activePopups[type] = popupInstance;
             BringToFront(popupInstance);
             ActivateBlocker();
@@ -74,25 +92,18 @@ public class PopupManager : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// ÆË¾÷ ´İ±â (¼û±è) + ºí·ÎÄ¿ »óÅÂ °»½Å
-    /// ÆË¾÷ ÀÚÃ¼ÀÇ ´İ±â ¹öÆ°ÀÌ³ª ºí·ÎÄ¿ Å¬¸¯½Ã ÀÌ ¸Ş¼­µå È£Ãâ ÃßÃµ
-    /// </summary>
     public void ClosePopup(PopupType type)
     {
-        if (activePopups.TryGetValue(type, out GameObject popup))
+        if (activePopups.TryGetValue(type, out GameObject popup) && popup != null)
         {
             popup.SetActive(false);
             CheckBlockerStatus();
         }
     }
 
-    /// <summary>
-    /// ÆË¾÷ ¿ÏÀü ÆÄ±« (ÇÊ¿ä ½Ã)
-    /// </summary>
     public void DestroyPopup(PopupType type)
     {
-        if (activePopups.TryGetValue(type, out GameObject popup))
+        if (activePopups.TryGetValue(type, out GameObject popup) && popup != null)
         {
             Destroy(popup);
             activePopups.Remove(type);
@@ -102,6 +113,12 @@ public class PopupManager : MonoBehaviour
 
     private void ActivateBlocker()
     {
+        if (currentCanvas == null)
+        {
+            Debug.LogError("PopupManager: Canvas not assigned. Cannot create blocker.");
+            return;
+        }
+
         if (globalBlocker == null)
         {
             if (blockerPrefab == null)
@@ -109,21 +126,16 @@ public class PopupManager : MonoBehaviour
                 Debug.LogError("PopupManager: Blocker Prefab is not assigned!");
                 return;
             }
-            globalBlocker = Instantiate(blockerPrefab, mainCanvas.transform, false);
-            // ºí·ÎÄ¿¸¦ ¸ÕÀú ÃÖ»ó´ÜÀ¸·Î ¿Ã¸² (ÃÖ»ó´Ü ¹è°æ)
+            globalBlocker = Instantiate(blockerPrefab, currentCanvas.transform, false);
             globalBlocker.transform.SetAsLastSibling();
-
             AddBlockerClickEvent(globalBlocker);
         }
+
         globalBlocker.SetActive(true);
-
-        // ºí·ÎÄ¿´Â ÃÖ»ó´Ü¿¡, ÆË¾÷Àº ±× À§¿¡ ´Ù½Ã ¿Ã¸²
         globalBlocker.transform.SetAsLastSibling();
-
         BringTopmostPopupToFront();
     }
 
-    // ºí·ÎÄ¿ Å¬¸¯ ½Ã °¡Àå À§ ÆË¾÷ ´İ±â ÀÌº¥Æ® Ãß°¡
     private void AddBlockerClickEvent(GameObject blocker)
     {
         var eventTrigger = blocker.GetComponent<EventTrigger>();
@@ -144,10 +156,8 @@ public class PopupManager : MonoBehaviour
         eventTrigger.triggers.Add(entry);
     }
 
-    // °¡Àå À§¿¡ È°¼ºÈ­µÈ ÆË¾÷À» ´İÀ½
     private void CloseTopmostPopup()
     {
-        // activePopups Áß È°¼ºÈ­µÈ °Í¸¸ ÇÊÅÍ¸µ ÈÄ, ¸¶Áö¸· »ı¼ºµÈ ÆË¾÷À» ´İÀ½
         for (int i = activePopups.Count - 1; i >= 0; i--)
         {
             var kvp = new List<KeyValuePair<PopupType, GameObject>>(activePopups)[i];
@@ -164,7 +174,7 @@ public class PopupManager : MonoBehaviour
         bool anyActive = false;
         foreach (var popup in activePopups.Values)
         {
-            if (popup.activeSelf)
+            if (popup != null && popup.activeSelf)
             {
                 anyActive = true;
                 break;
@@ -175,21 +185,27 @@ public class PopupManager : MonoBehaviour
         {
             globalBlocker.SetActive(false);
         }
+        else
+        {
+            // ë¸”ë¡œì»¤ ìœ„ì¹˜ ìˆ˜ì •: íŒì—… ì•„ë˜ë¡œ ì´ë™
+            if (globalBlocker != null)
+            {
+                globalBlocker.transform.SetAsLastSibling();
+                BringTopmostPopupToFront(); // ë‹¤ì‹œ í˜„ì¬ ìµœìƒìœ„ íŒì—… ìœ„ë¡œ ì˜¬ë¦¼
+            }
+        }
     }
 
     private void BringToFront(GameObject obj)
     {
-        // ºí·ÎÄ¿´Â Ç×»ó ÆË¾÷ ¾Æ·¡¿¡ ÀÖ¾î¾ß ÇÏ¹Ç·Î ¸ÕÀú ºí·ÎÄ¿¸¦ ¿Ã¸²
         if (globalBlocker != null)
         {
             globalBlocker.transform.SetAsLastSibling();
         }
 
-        // ÆË¾÷À» ºí·ÎÄ¿ À§·Î ¿Ã¸²
         obj.transform.SetAsLastSibling();
     }
 
-    // È°¼ºÈ­µÈ ÆË¾÷ Áß °¡Àå ÃÖ±Ù(¸¶Áö¸·)¿¡ È°¼ºÈ­µÈ ÆË¾÷À» ÃÖ»óÀ§·Î ¿Ã¸²
     private void BringTopmostPopupToFront()
     {
         for (int i = activePopups.Count - 1; i >= 0; i--)

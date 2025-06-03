@@ -9,13 +9,16 @@ EditorBuildSettings:
     path: Assets/Scenes/Home.unity
     guid: 657328f1f4d259e40ba1799e26aa9b91
   - enabled: 1
-    path: Assets/Scenes/Home UI.unity
-    guid: 6f3a00c0b7777ae4b8c31c14ad4f0648
-  - enabled: 1
     path: Assets/Scenes/Loading.unity
     guid: 87484c2ccbae5cc43a93d93570b7ee42
   - enabled: 1
     path: Assets/Scenes/Title.unity
     guid: 2cda990e2423bbf4892e6590ba056729
+  - enabled: 1
+    path: Assets/Scenes/InBattle UI.unity
+    guid: 94dffdbae90d08242b8a6df1ab2642e1
+  - enabled: 1
+    path: Assets/Scenes/Battle.unity
+    guid: c4874502c66483644bc867a3ccab81ed
   m_configObjects:
     com.unity.addressableassets: {fileID: 11400000, guid: 57335f146b08bbd46a89e02227b4bc5c, type: 2}
