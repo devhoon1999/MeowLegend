@@ -25,6 +25,7 @@ public class PlayerSession : MonoBehaviour
         playerData.playerId = id;
         playerData.score = 0;
         playerData.stage = 1;
+        playerData.heart = 3;
     }
 
     // 점수 누적
@@ -37,6 +38,12 @@ public class PlayerSession : MonoBehaviour
     public void SetStage(int stage)
     {
         playerData.stage = stage;
+    }
+
+    public void MinusHeart()
+    {
+        playerData.heart -= 1;
+        // 만약에 하트가 0이 되면 게임 종료하게끔 여기서 호출.
     }
 
     // 랭킹 매니저에 저장
