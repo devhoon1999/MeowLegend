@@ -25,8 +25,8 @@ public class NameInputUI : MonoBehaviour
             return;
         }
 
-        // Æ¯¼ö¹®ÀÚ Ã¼Å© (¿µ¾î, ¼ıÀÚ, ¹ØÁÙ(_)¸¸ Çã¿ë)
-        if (!Regex.IsMatch(playerName, @"^[a-zA-Z0-9_]+$"))
+        // ¿µ¾î, ¼ıÀÚ, ÇÑ±Û, ¹ØÁÙ¸¸ Çã¿ë
+        if (!Regex.IsMatch(playerName, @"^[a-zA-Z0-9°¡-ÆR_]+$"))
         {
             messageText.text = "Æ¯¼ö¹®ÀÚ´Â »ç¿ëÇÒ ¼ö ¾ø½À´Ï´Ù.";
             return;
@@ -38,16 +38,19 @@ public class NameInputUI : MonoBehaviour
             return;
         }
 
-        // µî·Ï ¼º°ø ¡æ ·©Å·¿¡ Ãß°¡
-        RankingManager.Instance.AddPlayerResult(playerName, 0, 1); // ÃÊ±â Á¡¼ö¿Í ½ºÅ×ÀÌÁö
+        // ÀÓ½Ã ¼¼¼Ç¿¡ ÀúÀå (·©Å·¿¡ ¾ÆÁ÷ µî·Ï ¾ÈÇÔ)
+        PlayerSession.Instance.SetPlayerId(playerName);
+
         messageText.text = "¾ÆÀÌµğ µî·Ï ¿Ï·á!";
+        submitButton.interactable = false;
+        nameInputField.interactable = false;
 
-        StartCoroutine(DelayandPlay(2f));
+        StartCoroutine(DelayAndStartGame(2f));
+    }
 
-        IEnumerator DelayandPlay(float sec)
-        {
-            yield return new WaitForSeconds(sec);
-            MySceneManager.Instance.LoadScene("Battle");
-        }
+    private IEnumerator DelayAndStartGame(float seconds)
+    {
+        yield return new WaitForSeconds(seconds);
+        MySceneManager.Instance.LoadScene("Battle"); // ¾À ÀÌ¸§Àº ½ÇÁ¦ »ç¿ë ÁßÀÎ °ÍÀ¸·Î ±³Ã¼
     }
 }
