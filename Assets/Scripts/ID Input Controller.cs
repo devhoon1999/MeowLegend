@@ -13,6 +13,7 @@ public class NameInputUI : MonoBehaviour
     private void Start()
     {
         submitButton.onClick.AddListener(OnSubmit);
+        Time.timeScale = 1f;
     }
 
     private void OnSubmit()

@@ -93,6 +93,8 @@ public class PopupManager : MonoBehaviour
         {
             Debug.LogWarning($"Popup prefab for type {type} not found.");
         }
+
+        Time.timeScale = 0f;
     }
 
     public void ClosePopup(PopupType type)
@@ -102,6 +104,8 @@ public class PopupManager : MonoBehaviour
             popup.SetActive(false);
             CheckBlockerStatus();
         }
+
+        Time.timeScale = 1f;
     }
 
     public void DestroyPopup(PopupType type)

@@ -43,7 +43,19 @@ public class PlayerSession : MonoBehaviour
     public void MinusHeart()
     {
         playerData.heart -= 1;
-        // 만약에 하트가 0이 되면 게임 종료하게끔 여기서 호출.
+        if (playerData.heart <= 0)
+        {
+            playerData.heart = 0;  // 음수 방지
+
+            // 게임 종료 처리 호출
+            OnGameOver();
+        }
+    }
+
+    private void OnGameOver()
+    {
+        Debug.Log("게임 종료! 하트가 모두 소진됨.");
+        MySceneManager.Instance.LoadScene("Title");
     }
 
     // 랭킹 매니저에 저장

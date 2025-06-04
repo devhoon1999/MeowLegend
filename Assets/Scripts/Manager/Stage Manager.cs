@@ -42,13 +42,6 @@ public class StageManager : MonoBehaviour
     private void OnStageChanged(int stage)
     {
         PlayerSession.Instance.SetStage(stage);
-        ReduceSpawnIntervalByPercent(80f);
-    }
-
-    public void ReduceSpawnIntervalByPercent(float percent)
-    {
-        percent = Mathf.Clamp(percent, 0f, 100f); // 0%~100% 사이 제한
-        float multiplier = percent / 100f;
-        spawner.spawnInterval *= multiplier;
+        spawner.spawnInterval -= 0.05f;
     }
 }

@@ -49,12 +49,12 @@ public class FallingItem : MonoBehaviour
         {
             if (gameObject.name.Contains("Skull"))
             {
-                //PlayerSession.Instance.MinusHeart();
+                PlayerSession.Instance.MinusHeart();
                 Debug.Log("아얏 아프다!"); // test
             }
             else
             {
-                //PlayerSession.Instance.AddScore(100);
+                PlayerSession.Instance.AddScore(100);
                 Debug.Log("100점 추가!"); // test
             }
             gameObject.SetActive(false);

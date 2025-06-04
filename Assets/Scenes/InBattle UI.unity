@@ -435,6 +435,7 @@ GameObject:
   - component: {fileID: 540518318}
   - component: {fileID: 540518320}
   - component: {fileID: 540518319}
+  - component: {fileID: 540518321}
   m_Layer: 5
   m_Name: Heart Group
   m_TagString: Untagged
@@ -502,6 +503,21 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 540518317}
   m_CullTransparentMesh: 1
+--- !u!114 &540518321
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 540518317}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 990f94b984576e44dacea1e80dbd8423, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  heart1: {fileID: 907391382}
+  heart2: {fileID: 448283007}
+  heart3: {fileID: 408677508}
 --- !u!1 &817571229
 GameObject:
   m_ObjectHideFlags: 0
@@ -924,6 +940,7 @@ GameObject:
   - component: {fileID: 1493567075}
   - component: {fileID: 1493567077}
   - component: {fileID: 1493567076}
+  - component: {fileID: 1493567078}
   m_Layer: 5
   m_Name: StageNum Text
   m_TagString: Untagged
@@ -1047,6 +1064,19 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1493567074}
   m_CullTransparentMesh: 1
+--- !u!114 &1493567078
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1493567074}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6b7bf4e3d167d984f90f781029c780fd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  stageText: {fileID: 1493567076}
 --- !u!1 &1822245260
 GameObject:
   m_ObjectHideFlags: 0
@@ -1203,6 +1233,7 @@ GameObject:
   - component: {fileID: 1846883955}
   - component: {fileID: 1846883957}
   - component: {fileID: 1846883956}
+  - component: {fileID: 1846883958}
   m_Layer: 5
   m_Name: Point Text
   m_TagString: Untagged
@@ -1326,6 +1357,19 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1846883954}
   m_CullTransparentMesh: 1
+--- !u!114 &1846883958
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1846883954}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6b44060d309c2a249b4b12eac6f5c32e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  scoreText: {fileID: 1846883956}
 --- !u!1 &2138213554
 GameObject:
   m_ObjectHideFlags: 0
