@@ -10,7 +10,6 @@ public enum PopupType
     Giveup,
     IDInputfield,
     Ranking
-    // 필요한 팝업 타입 추가
 }
 
 public class PopupManager : MonoBehaviour
@@ -61,28 +60,32 @@ public class PopupManager : MonoBehaviour
             return;
         }
 
-        // 🔍 기존 팝업이 파괴됐는지 확인
+        // 기존 팝업이 존재하면 파괴
         if (activePopups.TryGetValue(type, out GameObject existingPopup))
         {
-            if (existingPopup == null)
+            if (existingPopup != null)
             {
-                activePopups.Remove(type); // 참조 제거
+                Destroy(existingPopup);
             }
-            else
-            {
-                existingPopup.SetActive(true);
-                BringToFront(existingPopup);
-                ActivateBlocker();
-                return;
-            }
+            activePopups.Remove(type);
         }
 
-        // 새로 생성
         var entry = popupPrefabs.Find(p => p.type == type);
         if (entry != null && entry.prefab != null)
         {
             GameObject popupInstance = Instantiate(entry.prefab, currentCanvas.transform, false);
+            popupInstance.name = type.ToString(); // 디버깅 편하게 이름 설정
             activePopups[type] = popupInstance;
+
+            // 다른 팝업들을 아래로 내림
+            foreach (var popup in activePopups.Values)
+            {
+                if (popup != null && popup != popupInstance)
+                {
+                    popup.transform.SetSiblingIndex(0);
+                }
+            }
+
             BringToFront(popupInstance);
             ActivateBlocker();
         }
@@ -127,7 +130,7 @@ public class PopupManager : MonoBehaviour
                 return;
             }
             globalBlocker = Instantiate(blockerPrefab, currentCanvas.transform, false);
-            globalBlocker.transform.SetAsLastSibling();
+            globalBlocker.name = "Blocker";
             AddBlockerClickEvent(globalBlocker);
         }
 
@@ -185,14 +188,10 @@ public class PopupManager : MonoBehaviour
         {
             globalBlocker.SetActive(false);
         }
-        else
+        else if (globalBlocker != null)
         {
-            // 블로커 위치 수정: 팝업 아래로 이동
-            if (globalBlocker != null)
-            {
-                globalBlocker.transform.SetAsLastSibling();
-                BringTopmostPopupToFront(); // 다시 현재 최상위 팝업 위로 올림
-            }
+            globalBlocker.transform.SetAsLastSibling();
+            BringTopmostPopupToFront();
         }
     }
 
