@@ -7,6 +7,10 @@ public class PlayerController : MonoBehaviour
     public float moveSpeed = 5f;
     public float jumpForce = 10f;
 
+    [Header("Jump Settings")]
+    public float fallMultiplier = 2.5f;    // 내려올 때 중력 배수 (1보다 크면 빠르게 떨어짐)
+    public float lowJumpMultiplier = 2f;   // 점프 버튼 짧게 눌렀을 때 중력 배수
+
     [Header("Ground Check")]
     public Transform groundCheck;
     public float groundCheckRadius = 0.2f;
@@ -42,11 +46,21 @@ public class PlayerController : MonoBehaviour
         // 땅 체크
         isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, groundLayer);
 
-        // 점프 처리 (스페이스바를 누른 순간만 트리거 발동)
+        // 점프 처리 (스페이스바 누른 순간만)
         if (Input.GetKeyDown(KeyCode.Space) && isGrounded)
         {
             rb.velocity = new Vector2(rb.velocity.x, jumpForce);
             animator.SetTrigger("JumpTrigger");
+        }
+
+        // 낙하 속도 빠르게 (추가 중력 적용)
+        if (rb.velocity.y < 0)
+        {
+            rb.velocity += Vector2.up * Physics2D.gravity.y * (fallMultiplier - 1) * Time.deltaTime;
+        }
+        else if (rb.velocity.y > 0 && !Input.GetKey(KeyCode.Space)) // 점프 중 버튼 뗐을 때
+        {
+            rb.velocity += Vector2.up * Physics2D.gravity.y * (lowJumpMultiplier - 1) * Time.deltaTime;
         }
 
         // 애니메이션 상태 설정
@@ -60,7 +74,7 @@ public class PlayerController : MonoBehaviour
     private void ClampToCameraBounds()
     {
         Vector3 viewPos = mainCamera.WorldToViewportPoint(transform.position);
-        viewPos.x = Mathf.Clamp(viewPos.x, 0.05f, 0.95f);  // 좌우 여유 범위
+        viewPos.x = Mathf.Clamp(viewPos.x, 0.05f, 0.95f);
         Vector3 clampedWorldPos = mainCamera.ViewportToWorldPoint(viewPos);
         transform.position = new Vector3(clampedWorldPos.x, transform.position.y, transform.position.z);
     }

@@ -765,7 +765,7 @@ GameObject:
   - component: {fileID: 541551467}
   m_Layer: 3
   m_Name: Ground
-  m_TagString: Untagged
+  m_TagString: Ground
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1421,7 +1421,7 @@ GameObject:
   - component: {fileID: 862689793}
   - component: {fileID: 862689795}
   - component: {fileID: 862689794}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Player
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1530,7 +1530,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   moveSpeed: 5
-  jumpForce: 10
+  jumpForce: 15
+  fallMultiplier: 3
+  lowJumpMultiplier: 2
   groundCheck: {fileID: 962831514}
   groundCheckRadius: 0.1
   groundLayer:
@@ -1701,7 +1703,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 962831514}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Ground Check
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2930,6 +2932,70 @@ MonoBehaviour:
   autoScrollSpeed: {x: 0, y: 0}
   imageOverlap: 0.01
   oneImage: 1
+--- !u!1 &1905842339
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1905842341}
+  - component: {fileID: 1905842340}
+  m_Layer: 0
+  m_Name: FallingItemSpawner
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1905842340
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1905842339}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fbcca492f12f9cb43a199fa54dc541c8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  itemEntries:
+  - type: 1
+    prefab: {fileID: 2323241050005916130, guid: 9d5ce67a0096f004bbb2ade09451885d, type: 3}
+    poolSize: 10
+  - type: 0
+    prefab: {fileID: 7810116810105303886, guid: 195b05c984ce6214a825300b4f2f226f, type: 3}
+    poolSize: 10
+  - type: 2
+    prefab: {fileID: 8348273465390101383, guid: 568596f7f9ac9554598adeb1abf415c7, type: 3}
+    poolSize: 10
+  - type: 3
+    prefab: {fileID: 2346629436210035207, guid: 7a5944fce455778438fb44644ed2bc9e, type: 3}
+    poolSize: 10
+  - type: 4
+    prefab: {fileID: 3857439109621507023, guid: 5f9bd90cdce64dd47aba4f5e397b5021, type: 3}
+    poolSize: 10
+  spawnInterval: 0.2
+  fallSpeed: 3
+  xSpacingThreshold: 1
+  xCooldown: 1
+--- !u!4 &1905842341
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1905842339}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -1.0986559, y: -8.519863, z: 0.22273105}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
@@ -2939,3 +3005,4 @@ SceneRoots:
   - {fileID: 862689792}
   - {fileID: 607020892}
   - {fileID: 541551469}
+  - {fileID: 1905842341}
